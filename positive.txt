@@ -1,0 +1,39 @@
+import org.apache.spark.sql.SparkSession
+
+object NumberCheck {
+  def main(args: Array[String]): Unit = {
+    // Create SparkSession
+    val spark = SparkSession.builder
+      .appName("Number Check")
+      .master("local[*]")  // Using local mode, you can change it according to your setup
+      .getOrCreate()
+
+    // Sample data: list of numbers
+    val numbers = Seq(5, -3, 0, 12, -7, 3)
+
+    // Create RDD from the list
+    val rdd = spark.sparkContext.parallelize(numbers)
+
+    // Function to check if a number is positive, negative, or zero
+    def checkNumber(n: Int): String = {
+      if (n > 0) {
+        "Positive"
+      } else if (n < 0) {
+        "Negative"
+      } else {
+        "Zero"
+      }
+    }
+
+    // Apply the checkNumber function to each number in the RDD
+    val result = rdd.map(n => (n, checkNumber(n)))
+
+    // Collect the results and print them
+    result.collect().foreach {
+      case (num, result) => println(s"Number: $num is $result")
+    }
+
+    // Stop the Spark session
+    spark.stop()
+  }
+}

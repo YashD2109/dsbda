@@ -1,0 +1,36 @@
+import org.apache.spark.sql.SparkSession
+
+object Calculator {
+  def main(args: Array[String]): Unit = {
+    // Create SparkSession
+    val spark = SparkSession.builder
+      .appName("Calculator")
+      .master("local[*]")  // Using local mode, you can change it according to your setup
+      .getOrCreate()
+
+    // Sample numbers for calculation
+    val numbers = Seq((10, 5), (20, 4), (15, 3), (8, 2))
+
+    // Create RDD from the list of numbers (pairs of numbers for calculation)
+    val rdd = spark.sparkContext.parallelize(numbers)
+
+    // Perform the calculator operations
+    val result = rdd.map {
+      case (num1, num2) => (
+        num1 + num2,               // Addition
+        num1 - num2,               // Subtraction
+        num1 * num2,               // Multiplication
+        if (num2 != 0) num1 / num2 else "Undefined"  // Division (handle division by zero)
+      )
+    }
+
+    // Collect the results and print them
+    result.collect().foreach {
+      case (sum, difference, product, division) =>
+        println(s"Addition: $sum, Subtraction: $difference, Multiplication: $product, Division: $division")
+    }
+
+    // Stop the Spark session
+    spark.stop()
+  }
+}

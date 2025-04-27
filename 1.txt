@@ -1,0 +1,35 @@
+# 1. Import required libraries
+import pandas as pd
+import numpy as np
+
+# 2. Load the dataset
+# Dataset: Iris Flower Dataset
+# URL: https://www.kaggle.com/datasets/uciml/iris
+df = pd.read_csv('Iris.csv')
+
+# 3. Data Preprocessing
+# 3.1 Check for missing values
+print("Missing Values:\n", df.isnull().sum())
+
+# 3.2 Get initial statistics
+print("\nInitial Statistics:\n", df.describe())
+
+# 3.3 Check dataframe dimensions
+print("\nDataframe Dimensions:", df.shape)
+
+# 4. Data Formatting and Normalization
+# 4.1 Check data types
+print("\nData Types:\n", df.dtypes)
+
+# 4.2 Convert 'Id' column to string if not needed as numeric
+df['Id'] = df['Id'].astype(str)
+
+# 4.3 Confirm changes
+print("\nUpdated Data Types:\n", df.dtypes)
+
+# 5. Convert categorical variables into numeric
+# 'Species' column is categorical, encode it
+df['Species_encoded'] = df['Species'].astype('category').cat.codes
+
+# 5.1 Final Data Preview
+print("\nFinal Dataset Preview:\n", df.head())

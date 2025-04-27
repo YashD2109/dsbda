@@ -1,0 +1,41 @@
+# 1. Import required libraries
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
+
+# 2. Load the dataset
+df = pd.read_csv('Iris.csv')  # Make sure Iris.csv is in your folder
+
+# Preview data
+print("Dataset Preview:\n", df.head())
+
+# 3. Prepare features and target
+X = df[['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm']]
+y = df['Species']
+
+# 4. Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+
+# 5. Train Naive Bayes classifier
+model = GaussianNB()
+model.fit(X_train, y_train)
+
+# 6. Make predictions
+y_pred = model.predict(X_test)
+
+# 7. Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+print("\nConfusion Matrix:\n", cm)
+
+# For multiclass, calculate metrics using macro average
+accuracy = accuracy_score(y_test, y_pred)
+error_rate = 1 - accuracy
+precision = precision_score(y_test, y_pred, average='macro')
+recall = recall_score(y_test, y_pred, average='macro')
+
+# 8. Display results
+print(f"\nAccuracy: {accuracy:.4f}")
+print(f"Error Rate: {error_rate:.4f}")
+print(f"Precision (Macro Avg): {precision:.4f}")
+print(f"Recall (Macro Avg): {recall:.4f}")

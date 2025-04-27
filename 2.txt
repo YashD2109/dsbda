@@ -1,0 +1,82 @@
+# 1. Import required libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 2. Create Academic Performance Dataset
+data = {
+    'StudentID': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    'Math_Score': [88, 92, np.nan, 45, 77, 85, 90, 95, 300, 65],   # 300 is an outlier
+    'Science_Score': [82, 79, 91, 44, 80, 83, np.nan, 96, 78, 70],
+    'English_Score': [75, 80, 70, 65, 90, 85, 95, 88, 92, np.nan]
+}
+df = pd.DataFrame(data)
+
+# 3. Scan for Missing Values
+print("Missing Values:\n", df.isnull().sum())
+
+# 3.1 Handle Missing Values
+# We'll fill missing values with the mean of respective columns
+df['Math_Score'].fillna(df['Math_Score'].mean(), inplace=True)
+df['Science_Score'].fillna(df['Science_Score'].mean(), inplace=True)
+df['English_Score'].fillna(df['English_Score'].mean(), inplace=True)
+
+# Confirm no missing values
+print("\nAfter Handling Missing Values:\n", df.isnull().sum())
+
+# 4. Scan for Outliers
+# Using boxplots
+plt.figure(figsize=(10, 4))
+plt.subplot(1, 3, 1)
+sns.boxplot(y=df['Math_Score'])
+plt.title('Math Score')
+
+plt.subplot(1, 3, 2)
+sns.boxplot(y=df['Science_Score'])
+plt.title('Science Score')
+
+plt.subplot(1, 3, 3)
+sns.boxplot(y=df['English_Score'])
+plt.title('English Score')
+
+plt.tight_layout()
+plt.show()
+
+# 4.1 Handle Outliers
+# We'll cap the Math_Score outlier using IQR method
+Q1 = df['Math_Score'].quantile(0.25)
+Q3 = df['Math_Score'].quantile(0.75)
+IQR = Q3 - Q1
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+df['Math_Score'] = np.where(df['Math_Score'] > upper_bound, upper_bound, df['Math_Score'])
+df['Math_Score'] = np.where(df['Math_Score'] < lower_bound, lower_bound, df['Math_Score'])
+
+# Check again with boxplot
+plt.figure(figsize=(4, 4))
+sns.boxplot(y=df['Math_Score'])
+plt.title('Math Score After Outlier Treatment')
+plt.show()
+
+# 5. Data Transformation
+# Transform 'Science_Score' to reduce skewness using log transformation
+# Reason: Decrease skewness and make distribution more normal
+df['Science_Score_Log'] = np.log(df['Science_Score'])
+
+# Check original vs transformed distribution
+plt.figure(figsize=(8, 4))
+plt.subplot(1, 2, 1)
+sns.histplot(df['Science_Score'], kde=True)
+plt.title('Original Science Score')
+
+plt.subplot(1, 2, 2)
+sns.histplot(df['Science_Score_Log'], kde=True)
+plt.title('Log Transformed Science Score')
+
+plt.tight_layout()
+plt.show()
+
+# Final Data Preview
+print("\nFinal Dataset:\n", df)
